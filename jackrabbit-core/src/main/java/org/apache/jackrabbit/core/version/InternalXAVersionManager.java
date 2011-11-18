@@ -42,6 +42,8 @@ import org.apache.jackrabbit.core.state.NoSuchItemStateException;
 import org.apache.jackrabbit.core.state.NodeReferences;
 import org.apache.jackrabbit.core.state.NodeState;
 import org.apache.jackrabbit.core.state.XAItemStateManager;
+import org.apache.jackrabbit.core.version.IVersioningLock.IReadLock;
+import org.apache.jackrabbit.core.version.IVersioningLock.IWriteLock;
 import org.apache.jackrabbit.core.virtual.VirtualItemStateProvider;
 import org.apache.jackrabbit.core.virtual.VirtualNodeState;
 import org.apache.jackrabbit.core.virtual.VirtualPropertyState;
@@ -89,7 +91,7 @@ public class InternalXAVersionManager extends InternalVersionManagerBase
     /**
      * The global write lock on the version manager.
      */
-    private VersioningLock.WriteLock vmgrLock;
+    private IWriteLock vmgrLock;
 
     /**
      * Persistent root node of the version histories.
@@ -716,7 +718,7 @@ public class InternalXAVersionManager extends InternalVersionManagerBase
      */
     private InternalVersionHistoryImpl makeLocalCopy(InternalVersionHistoryImpl history)
             throws RepositoryException {
-        VersioningLock.ReadLock lock = acquireReadLock();
+        IReadLock lock = acquireReadLock();
         try {
             NodeState state = (NodeState) stateMgr.getItemState(history.getId());
             NodeStateEx stateEx = new NodeStateEx(stateMgr, ntReg, state, null);
@@ -738,7 +740,7 @@ public class InternalXAVersionManager extends InternalVersionManagerBase
      */
     private InternalActivityImpl makeLocalCopy(InternalActivityImpl act)
             throws RepositoryException {
-        VersioningLock.ReadLock lock = acquireReadLock();
+        IReadLock lock = acquireReadLock();
         try {
             NodeState state = (NodeState) stateMgr.getItemState(act.getId());
             NodeStateEx stateEx = new NodeStateEx(stateMgr, ntReg, state, null);

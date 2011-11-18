@@ -54,6 +54,7 @@ import org.apache.jackrabbit.core.state.NodeState;
 import org.apache.jackrabbit.core.state.PropertyState;
 import org.apache.jackrabbit.core.state.SharedItemStateManager;
 import org.apache.jackrabbit.core.value.InternalValue;
+import org.apache.jackrabbit.core.version.IVersioningLock.IReadLock;
 import org.apache.jackrabbit.core.virtual.VirtualItemStateProvider;
 import org.apache.jackrabbit.spi.Name;
 import org.apache.jackrabbit.spi.Path;
@@ -300,7 +301,7 @@ public class InternalVersionManagerImpl extends InternalVersionManagerBase
      * {@inheritDoc}
      */
     public boolean hasItem(NodeId id) {
-        VersioningLock.ReadLock lock = acquireReadLock();
+        IReadLock lock = acquireReadLock();
         try {
             return stateMgr.hasItemState(id);
         } finally {
@@ -320,7 +321,7 @@ public class InternalVersionManagerImpl extends InternalVersionManagerBase
         if (id.equals(activitiesId)) {
             return null;
         }
-        VersioningLock.ReadLock lock = acquireReadLock();
+        IReadLock lock = acquireReadLock();
         try {
             synchronized (versionItems) {
                 InternalVersionItem item = versionItems.get(id);
@@ -463,7 +464,7 @@ public class InternalVersionManagerImpl extends InternalVersionManagerBase
      * @param items items updated
      */
     public void itemsUpdated(Collection<InternalVersionItem> items) {
-        VersioningLock.ReadLock lock = acquireReadLock();
+        IReadLock lock = acquireReadLock();
         try {
             synchronized (versionItems) {
                 for (InternalVersionItem item : items) {
@@ -501,7 +502,7 @@ public class InternalVersionManagerImpl extends InternalVersionManagerBase
      */
     protected void itemDiscarded(InternalVersionItem item) {
         // evict removed item from cache
-        VersioningLock.ReadLock lock = acquireReadLock();
+        IReadLock lock = acquireReadLock();
         try {
             versionItems.remove(item.getId());
         } finally {
@@ -599,7 +600,7 @@ public class InternalVersionManagerImpl extends InternalVersionManagerBase
      */
     public void stateDestroyed(ItemState destroyed) {
         // evict removed item from cache
-        VersioningLock.ReadLock lock = acquireReadLock();
+        IReadLock lock = acquireReadLock();
         try {
             versionItems.remove(destroyed.getId());
         } finally {

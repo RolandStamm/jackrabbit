@@ -32,7 +32,7 @@ import EDU.oswego.cs.dl.util.concurrent.Sync;
  * to be re-entered not just by a thread that's already holding the lock but
  * by any thread within the same transaction.
  */
-public class VersioningLock {
+public class VersioningLock implements IVersioningLock {
 
     /**
      * The internal read-write lock.
@@ -46,7 +46,7 @@ public class VersioningLock {
      */
     private final ReadWriteLock xidRwLock = new XidRWLock();
 
-    public ReadLock acquireReadLock() throws InterruptedException {
+    public IReadLock acquireReadLock() throws InterruptedException {
         if (TransactionContext.getCurrentXid() == null) {
             return new ReadLock(rwLock.readLock());
         } else {
@@ -54,7 +54,7 @@ public class VersioningLock {
         }
     }
 
-    public WriteLock acquireWriteLock() throws InterruptedException {
+    public IWriteLock acquireWriteLock() throws InterruptedException {
         if (TransactionContext.getCurrentXid() == null) {
             return new WriteLock(rwLock);
         } else {
@@ -62,7 +62,7 @@ public class VersioningLock {
         }
     }
 
-    public static class WriteLock {
+    public static class WriteLock implements IWriteLock {
 
         private ReadWriteLock readWriteLock;
 
@@ -72,19 +72,19 @@ public class VersioningLock {
             this.readWriteLock.writeLock().acquire();
         }
 
-        public void release() {
+	public void release() {
             readWriteLock.writeLock().release();
         }
 
-        public ReadLock downgrade() throws InterruptedException {
-            ReadLock rLock = new ReadLock(readWriteLock.readLock());
+	public IReadLock downgrade() throws InterruptedException {
+            IReadLock rLock = new ReadLock(readWriteLock.readLock());
             release();
             return rLock;
         }
 
     }
 
-    public static class ReadLock {
+    public static class ReadLock implements IReadLock {
 
         private final Sync readLock;
 
@@ -93,7 +93,7 @@ public class VersioningLock {
             this.readLock.acquire();
         }
 
-        public void release() {
+	public void release() {
             readLock.release();
         }
 

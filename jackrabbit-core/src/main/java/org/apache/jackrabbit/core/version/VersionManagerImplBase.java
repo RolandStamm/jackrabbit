@@ -453,9 +453,9 @@ abstract public class VersionManagerImplBase {
          */
         private boolean success = false;
 
-        private final VersioningLock.WriteLock lock;
+        private final IVersioningLock.IWriteLock lock;
 
-        public WriteOperation(VersioningLock.WriteLock lock) {
+        public WriteOperation(IVersioningLock.IWriteLock lock) {
             this.lock = lock;
         }
 
@@ -491,7 +491,7 @@ abstract public class VersionManagerImplBase {
      * Acquires the write lock on this version manager.
      * @return returns the write lock
      */
-    protected VersioningLock.WriteLock acquireWriteLock() {
+    protected IVersioningLock.IWriteLock acquireWriteLock() {
         while (true) {
             try {
                 return rwLock.acquireWriteLock();
@@ -505,7 +505,7 @@ abstract public class VersionManagerImplBase {
      * acquires the read lock on this version manager.
      * @return returns the read lock
      */
-    protected VersioningLock.ReadLock acquireReadLock() {
+    protected IVersioningLock.IReadLock acquireReadLock() {
         while (true) {
             try {
                 return rwLock.acquireReadLock();
@@ -540,7 +540,7 @@ abstract public class VersionManagerImplBase {
      */
     public WriteOperation startWriteOperation() throws RepositoryException {
         boolean success = false;
-        VersioningLock.WriteLock lock = acquireWriteLock();
+        IVersioningLock.IWriteLock lock = acquireWriteLock();
         try {
             stateMgr.edit();
             success = true;

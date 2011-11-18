@@ -18,6 +18,7 @@ package org.apache.jackrabbit.core.version;
 
 import org.apache.jackrabbit.core.state.ChildNodeEntry;
 import org.apache.jackrabbit.core.value.InternalValue;
+import org.apache.jackrabbit.core.version.IVersioningLock.IReadLock;
 import org.apache.jackrabbit.core.id.NodeId;
 import org.apache.jackrabbit.spi.Name;
 import org.apache.jackrabbit.spi.commons.name.NameConstants;
@@ -145,7 +146,7 @@ class InternalVersionImpl extends InternalVersionItemImpl
      * {@inheritDoc}
      */
     public List<InternalVersion> getSuccessors() {
-        VersioningLock.ReadLock lock = vMgr.acquireReadLock();
+        IReadLock lock = vMgr.acquireReadLock();
         try {
             InternalValue[] values =
                 node.getPropertyValues(NameConstants.JCR_SUCCESSORS);

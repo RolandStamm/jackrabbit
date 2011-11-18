@@ -21,8 +21,8 @@ import java.io.InputStream;
 import java.util.HashMap;
 import java.util.Map;
 
+import org.apache.jackrabbit.core.version.IVersioningLock.IReadLock;
 import org.apache.jackrabbit.core.version.InternalVersionManagerImpl;
-import org.apache.jackrabbit.core.version.VersioningLock;
 import org.apache.jackrabbit.spi.commons.conversion.DefaultNamePathResolver;
 import org.apache.jackrabbit.spi.commons.conversion.NamePathResolver;
 import org.apache.jackrabbit.spi.commons.namespace.NamespaceResolver;
@@ -184,7 +184,7 @@ public abstract class AbstractJournal implements Journal {
      */
     public void sync() throws JournalException {
         if (internalVersionManager != null) {
-            VersioningLock.ReadLock lock =
+            IReadLock lock =
                 internalVersionManager.acquireReadLock();
             try {
                 internalSync();
@@ -259,7 +259,7 @@ public abstract class AbstractJournal implements Journal {
      */
     public void lockAndSync() throws JournalException {
         if (internalVersionManager != null) {
-            VersioningLock.ReadLock lock =
+            IReadLock lock =
                 internalVersionManager.acquireReadLock();
             try {
                 internalLockAndSync();
