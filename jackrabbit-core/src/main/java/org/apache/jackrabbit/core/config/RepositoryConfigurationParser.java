@@ -31,6 +31,7 @@ import org.apache.jackrabbit.core.query.QueryHandler;
 import org.apache.jackrabbit.core.query.QueryHandlerContext;
 import org.apache.jackrabbit.core.query.QueryHandlerFactory;
 import org.apache.jackrabbit.core.state.DefaultISMLocking;
+import org.apache.jackrabbit.core.state.DefaultISMRWLock;
 import org.apache.jackrabbit.core.state.ISMLocking;
 import org.apache.jackrabbit.core.state.ISMLockingFactory;
 import org.apache.jackrabbit.core.util.RepositoryLock;
@@ -193,7 +194,7 @@ public class RepositoryConfigurationParser extends ConfigurationParser {
     private static final String AC_PROVIDER_ELEMENT = "AccessControlProvider";
 
     /**
-     * The repositories {@link ConnectionFactory}. 
+     * The repositories {@link ConnectionFactory}.
      */
     protected final ConnectionFactory connectionFactory;
 
@@ -341,7 +342,7 @@ public class RepositoryConfigurationParser extends ConfigurationParser {
                 maxIdleTime, template, vc, qhf, cc, dsf, rlf, dsc, connectionFactory, this);
     }
 
-    
+
     /**
      * {@inheritDoc}
      */
@@ -743,7 +744,7 @@ public class RepositoryConfigurationParser extends ConfigurationParser {
                 if (element != null) {
                     return parseBeanConfig(element).newInstance(ISMLocking.class);
                 } else {
-                    return new DefaultISMLocking();
+                    return new DefaultISMRWLock();
                 }
             }
         };
