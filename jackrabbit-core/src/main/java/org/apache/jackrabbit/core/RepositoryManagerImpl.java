@@ -26,14 +26,14 @@ import org.apache.jackrabbit.api.management.RepositoryManager;
  */
 public class RepositoryManagerImpl implements RepositoryManager {
 
-    private final RepositoryImpl repository;
+    private final TransientRepository tr;
 
-    RepositoryManagerImpl(RepositoryImpl repository) {
-        this.repository = repository;
+    RepositoryManagerImpl(TransientRepository tr) {
+        this.tr = tr;
     }
 
     public DataStoreGarbageCollector createDataStoreGarbageCollector() throws RepositoryException {
-	RepositoryImpl rep = repository;
+        RepositoryImpl rep = tr.getRepository();
         if (rep != null) {
             return rep.createDataStoreGarbageCollector();
         } else {
@@ -42,7 +42,7 @@ public class RepositoryManagerImpl implements RepositoryManager {
     }
 
     public void stop() {
-        repository.shutdown();
+        tr.shutdown();
     }
 
 }

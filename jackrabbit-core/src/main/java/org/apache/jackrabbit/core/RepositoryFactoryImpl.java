@@ -36,8 +36,6 @@ import org.apache.jackrabbit.api.JackrabbitRepository;
 import org.apache.jackrabbit.api.JackrabbitRepositoryFactory;
 import org.apache.jackrabbit.api.management.RepositoryManager;
 import org.apache.jackrabbit.commons.JcrUtils;
-import org.apache.jackrabbit.core.RepositoryImpl;
-import org.apache.jackrabbit.core.config.RepositoryConfig;
 
 /**
  * <code>RepositoryFactoryImpl</code> implements a repository factory that
@@ -61,15 +59,16 @@ public class RepositoryFactoryImpl implements JackrabbitRepositoryFactory {
      * Map of repository instances.
      * Key = repository parameters, value = repository instance.
      */
-    private static final Map<Properties, Repository> REPOSITORIES =
-        new HashMap<Properties, Repository>();
+    private static final Map<Properties, TransientRepository> REPOSITORIES =
+        new HashMap<Properties, TransientRepository>();
 
     /**
      * The repository instances that were created by this factory.
      */
-    private final Set<Repository> ownRepositories =
-        new HashSet<Repository>();
+    private final Set<TransientRepository> ownRepositories =
+        new HashSet<TransientRepository>();
 
+    @SuppressWarnings("unchecked")
     public Repository getRepository(Map parameters) throws RepositoryException {
         if (parameters == null) {
             return getRepository(null, Collections.emptyMap());
@@ -103,7 +102,7 @@ public class RepositoryFactoryImpl implements JackrabbitRepositoryFactory {
 
     private Repository getRepository(String home, Map<?, ?> parameters)
             throws RepositoryException {
-       Repository repository =
+        TransientRepository repository =
             getOrCreateRepository(home, parameters);
         ownRepositories.add(repository);
         return repository;
@@ -118,7 +117,7 @@ public class RepositoryFactoryImpl implements JackrabbitRepositoryFactory {
      * @throws RepositoryException if an error occurs while creating the
      *          repository instance.
      */
-    private static synchronized Repository getOrCreateRepository(
+    private static synchronized TransientRepository getOrCreateRepository(
             String home, Map<?, ?> parameters) throws RepositoryException {
         // Prepare the repository properties
         Properties properties = new Properties(System.getProperties());
@@ -138,16 +137,16 @@ public class RepositoryFactoryImpl implements JackrabbitRepositoryFactory {
             properties.put(REPOSITORY_HOME_VARIABLE, home);
         }
 
-        Repository repository = REPOSITORIES.get(properties);
+        TransientRepository repository = REPOSITORIES.get(properties);
         if (repository == null) {
             try {
-               Repository tr;
+                TransientRepository tr;
                 if (home == null) {
-                    tr = RepositoryImpl.create(RepositoryConfig.install(properties));
+                    tr = new TransientRepository(properties);
                     // also remember this instance as the default repository
                     REPOSITORIES.put(null, tr);
                 } else {
-                    tr = RepositoryImpl.create(RepositoryConfig.install(properties));
+                    tr = new TransientRepository(properties);
                 }
                 REPOSITORIES.put(properties, tr);
                 repository = tr;
@@ -160,13 +159,13 @@ public class RepositoryFactoryImpl implements JackrabbitRepositoryFactory {
     }
 
     public RepositoryManager getRepositoryManager(JackrabbitRepository repo) throws RepositoryException {
-        if (!(repo instanceof RepositoryImpl)) {
+        if (!(repo instanceof TransientRepository)) {
             throw new RepositoryException("The repository was not created in this factory");
         }
         if (!ownRepositories.contains(repo)) {
             throw new RepositoryException("The repository was not created in this factory");
         }
-        return new RepositoryManagerImpl((RepositoryImpl) repo);
+        return new RepositoryManagerImpl((TransientRepository) repo);
     }
 
 }
