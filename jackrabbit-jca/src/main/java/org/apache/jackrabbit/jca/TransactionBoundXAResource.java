@@ -34,7 +34,7 @@ public class TransactionBoundXAResource implements XAResource {
         this.xaResource = xaResource;
         this.connection = connection;
     }
-    
+
     /**
      * There is a one-to-one Relation between this TransactionBoundXAResource
      * and the JCAManagedConnection so the used XAResource must be in sync when it is changed in the
@@ -49,18 +49,20 @@ public class TransactionBoundXAResource implements XAResource {
         xaResource.commit(arg0, arg1);
     }
 
-    public void end(Xid arg0, int arg1) throws XAException {
-        if (!ending) {
-            this.ending = true;
-            try {
-                xaResource.end(arg0, arg1);
-            } finally {
-                this.connection.closeHandles();
+   public void end(Xid xid, int i) throws XAException {
+      if ( !ending) {
+         this.ending = true;
+         try {
+            xaResource.end(xid, i);
+         } finally {
+            if (i != XAResource.TMSUSPEND) {
+               this.connection.closeHandles();
             }
-            // reuse the XAResource
-            this.ending = false;
-        }
-    }
+         }
+         // reuse the XAResource
+         this.ending = false;
+      }
+   }
 
     public void forget(Xid arg0) throws XAException {
         xaResource.forget(arg0);
